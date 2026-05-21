@@ -1,0 +1,1127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SKY SHIELD | Flight Integrity Dashboard</title>
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <svg class="svg-sprite" aria-hidden="true">
+      <symbol id="icon-plane" viewBox="0 0 24 24">
+        <path fill="currentColor" stroke="none" d="M12 1.7c.8 0 1.4 1 1.4 2.2v4.6l7.2 4.4c.5.3.8.8.8 1.4v1.4c0 .5-.5.8-.9.6l-7.1-2.2v3.2l2.4 2.1c.3.2.4.5.4.9v.9c0 .4-.4.7-.8.6L12 20.6l-3.4 1.2c-.4.1-.8-.2-.8-.6v-.9c0-.4.1-.7.4-.9l2.4-2.1v-3.2l-7.1 2.2c-.4.2-.9-.1-.9-.6v-1.4c0-.6.3-1.1.8-1.4l7.2-4.4V3.9c0-1.2.6-2.2 1.4-2.2Z" />
+        <path d="M12 3.6v16.2M8.7 13.5l3.3-.9 3.3.9" />
+      </symbol>
+      <symbol id="icon-globe" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M3 12h18M12 3c2.2 2.5 3.3 5.5 3.3 9s-1.1 6.5-3.3 9M12 3C9.8 5.5 8.7 8.5 8.7 12s1.1 6.5 3.3 9" />
+      </symbol>
+      <symbol id="icon-shield" viewBox="0 0 24 24">
+        <path d="M12 3 5 6v5.4c0 4.5 2.8 7.8 7 9.6 4.2-1.8 7-5.1 7-9.6V6l-7-3Z" />
+        <path d="M9 12.3 11.2 14 15.5 9.5" />
+      </symbol>
+      <symbol id="icon-radar" viewBox="0 0 24 24">
+        <path d="M12 20a8 8 0 1 0-8-8" />
+        <path d="M12 16a4 4 0 1 0-4-4" />
+        <path d="M12 12 20 4" />
+        <path d="M3 21h18" />
+      </symbol>
+      <symbol id="icon-activity" viewBox="0 0 24 24">
+        <path d="M3 12h4l2.5-6 5 12 2.5-6h4" />
+      </symbol>
+      <symbol id="icon-database" viewBox="0 0 24 24">
+        <ellipse cx="12" cy="5" rx="7" ry="3" />
+        <path d="M5 5v6c0 1.7 3.1 3 7 3s7-1.3 7-3V5" />
+        <path d="M5 11v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6" />
+      </symbol>
+      <symbol id="icon-log" viewBox="0 0 24 24">
+        <path d="M6 3h9l3 3v15H6V3Z" />
+        <path d="M14 3v4h4M9 11h6M9 15h6M9 19h4" />
+      </symbol>
+      <symbol id="icon-settings" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a8 8 0 0 0 .1-1.1 8 8 0 0 0-.1-1.1l2-1.5-2-3.5-2.4 1a8.6 8.6 0 0 0-1.9-1.1L14.8 5H9.2l-.4 2.7c-.7.3-1.3.6-1.9 1.1l-2.4-1-2 3.5 2 1.5a8 8 0 0 0-.1 1.1 8 8 0 0 0 .1 1.1l-2 1.5 2 3.5 2.4-1c.6.5 1.2.8 1.9 1.1l.4 2.7h5.6l.4-2.7c.7-.3 1.3-.6 1.9-1.1l2.4 1 2-3.5-2.1-1.5Z" />
+      </symbol>
+      <symbol id="icon-search" viewBox="0 0 24 24">
+        <circle cx="10.8" cy="10.8" r="6.3" />
+        <path d="m16 16 4 4" />
+      </symbol>
+      <symbol id="icon-alert" viewBox="0 0 24 24">
+        <path d="M12 3 2.8 20h18.4L12 3Z" />
+        <path d="M12 9v5M12 17h.01" />
+      </symbol>
+    </svg>
+
+    <main class="page-shell">
+      <section class="hero-band" aria-label="SKY SHIELD introduction">
+        <header class="top-nav">
+          <a class="brand" href="./index.html" aria-label="SKY SHIELD home">
+            <span class="brand-mark"><svg><use href="#icon-shield"></use></svg></span>
+            <span class="brand-copy">
+              <strong>SKY SHIELD</strong>
+            </span>
+          </a>
+
+          <!-- Fix #3: Label-only nav links, no icons -->
+          <nav class="nav-pills" aria-label="Dashboard sections">
+            <button class="active" type="button" data-section-target="live-airspace">Live Airspace</button>
+            <button type="button" data-section-target="flight-lens">Flight Lens</button>
+            <button type="button" data-section-target="integrity-engine">Integrity Engine</button>
+            <button type="button" data-section-target="threat-sim">Threat Sim</button>
+            <button type="button" data-section-target="fleet-intelligence">Fleet</button>
+            <button type="button" data-section-target="evidence-log">Evidence Log</button>
+            <button type="button" data-section-target="model-lab">Model Lab</button>
+          </nav>
+
+          <!-- Fix #9: Separate NOMINAL status + LIVE FEED button + 429 badge -->
+          <div class="nav-right-cluster">
+            <div class="status-nominal">
+              <span class="pulse-dot pulse-green"></span>
+              <span id="feed-health-label">NOMINAL</span>
+            </div>
+            <button id="live-feed-button" class="live-feed-btn" type="button">
+              <span class="pulse-dot pulse-amber"></span>
+              LIVE FEED
+            </button>
+            <span id="nav-aircraft-count" class="aircraft-badge">429</span>
+          </div>
+        </header>
+
+        <div class="hero-content">
+          <div class="hero-copy">
+            <div class="meta-pills">
+              <!-- Fix #4: "2026" → "v2.6 · LIVE" version badge -->
+              <span>AI ASSURANCE</span>
+              <span>FLIGHT TRACKING</span>
+              <span>CYBER INTEGRITY</span>
+              <span class="version-badge">v2.6 · LIVE</span>
+            </div>
+            <!-- Fix #8: "Realtime" → "Real-time" -->
+            <h1>Real-time flight tracking with a cyber integrity layer.</h1>
+            <!-- Fix #6: Add subline between headline and body -->
+            <p class="hero-subline">Airspace verified. Threats neutralised.</p>
+            <p>
+              A premium aviation dashboard that tracks live aircraft, simulates
+              GPS spoofing, and shows how SKY SHIELD verifies data before AI
+              recommendations become trusted.
+            </p>
+          </div>
+
+          <!-- Fix #1: Stats panel with trend arrows, threshold labels, severity color -->
+          <!-- Fix #2: CSS grid positions headline cols 1–7, stats card cols 9–12 -->
+          <section class="hero-metrics" aria-label="Current monitoring summary">
+            <div class="metric-row">
+              <span class="metric-label">Aircraft tracked</span>
+              <div class="metric-value-group">
+                <strong id="aircraft-count" class="metric-amber">428</strong>
+                <span id="aircraft-trend" class="metric-trend trend-up">↑ 6%</span>
+              </div>
+              <span id="aircraft-context" class="metric-context">vs 401 last hr</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">Fleet integrity</span>
+              <div class="metric-value-group">
+                <strong id="fleet-score" class="metric-green">94%</strong>
+                <span id="fleet-trend" class="metric-trend trend-stable">→ stable</span>
+              </div>
+              <span id="fleet-context" class="metric-context">target: 95%</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">Threat watch</span>
+              <div class="metric-value-group">
+                <strong id="watch-count" class="metric-red">28</strong>
+                <span id="watch-trend" class="metric-trend trend-warn">↑ HIGH</span>
+              </div>
+              <span id="watch-context" class="metric-context">threshold: 30</span>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="live-airspace" class="dashboard-shell" aria-label="Live airspace dashboard">
+        <aside class="icon-rail" aria-label="Workspace navigation">
+          <button class="active" type="button" title="Live Airspace" data-section-target="live-airspace">
+            <svg><use href="#icon-plane"></use></svg>
+          </button>
+          <button type="button" title="Flight Lens" data-section-target="flight-lens">
+            <svg><use href="#icon-globe"></use></svg>
+          </button>
+          <button type="button" title="Integrity Engine" data-section-target="integrity-engine">
+            <svg><use href="#icon-shield"></use></svg>
+          </button>
+          <button type="button" title="Threat Simulation" data-section-target="threat-sim">
+            <svg><use href="#icon-radar"></use></svg>
+          </button>
+          <button type="button" title="Fleet Intelligence" data-section-target="fleet-intelligence">
+            <svg><use href="#icon-activity"></use></svg>
+          </button>
+          <button type="button" title="Evidence Log" data-section-target="evidence-log">
+            <svg><use href="#icon-log"></use></svg>
+          </button>
+          <button type="button" title="Model Lab" data-section-target="model-lab">
+            <svg><use href="#icon-database"></use></svg>
+          </button>
+        </aside>
+
+        <section class="simulation-pane" aria-label="Live globe flight simulation">
+          <div class="pane-toolbar">
+            <div class="search-pill">
+              <input id="callsign-search" aria-label="Search flights" placeholder="Search callsign or ICAO" />
+              <button class="selector" type="button">Flight Number</button>
+              <button id="search-button" class="search" type="button" aria-label="Search">
+                <svg><use href="#icon-search"></use></svg>
+              </button>
+            </div>
+            <div class="control-cluster">
+              <label class="region-select" for="region-select">
+                <span>Region</span>
+                <select id="region-select" aria-label="Airspace region">
+                  <option value="europe">Europe corridor</option>
+                  <option value="gulf">Gulf corridor</option>
+                  <option value="singapore">Singapore FIR</option>
+                  <option value="atlantic">North Atlantic</option>
+                </select>
+              </label>
+              <button id="view-toggle" class="mode-toggle view-toggle" type="button">Map</button>
+              <button id="refresh-live" class="mode-toggle" type="button">Refresh</button>
+            </div>
+          </div>
+
+          <div class="airspace-overlay">
+            <div class="airspace-status-strip" aria-label="Live airspace status">
+              <article>
+                <span>Feed</span>
+                <strong id="feed-mode">CONNECTING</strong>
+                <small id="feed-status-note">Trying OpenSky public feed</small>
+              </article>
+              <article>
+                <span>Tracked</span>
+                <strong id="status-aircraft-count">428</strong>
+                <small id="tracked-note">aircraft state vectors</small>
+              </article>
+              <article>
+                <span>Anomalies</span>
+                <strong id="status-anomalies">28</strong>
+                <small id="anomaly-note">computed watchlist</small>
+              </article>
+              <article>
+                <span>Latency</span>
+                <strong id="status-latency">--</strong>
+                <small id="latency-note">latest refresh</small>
+              </article>
+            </div>
+
+            <div class="airspace-filter-bar" aria-label="Flight filters">
+              <label>
+                <span>Altitude</span>
+                <select id="altitude-filter" aria-label="Altitude filter">
+                  <option value="all">All bands</option>
+                  <option value="low">Below FL100</option>
+                  <option value="cruise">Cruise FL100+</option>
+                  <option value="ground">Ground</option>
+                </select>
+              </label>
+              <label>
+                <span>Speed</span>
+                <select id="speed-filter" aria-label="Speed filter">
+                  <option value="all">All speeds</option>
+                  <option value="slow">Under 250 kt</option>
+                  <option value="normal">250-480 kt</option>
+                  <option value="fast">480+ kt</option>
+                </select>
+              </label>
+              <label>
+                <span>Status</span>
+                <select id="anomaly-filter" aria-label="Anomaly filter">
+                  <option value="all">All states</option>
+                  <option value="normal">Normal</option>
+                  <option value="watch">Watch</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div class="globe-stage">
+            <div id="maplibre-stage" class="maplibre-stage" aria-label="Interactive airspace map"></div>
+
+            <div class="fallback-globe-scene" aria-hidden="true">
+              <div class="orbit orbit-one">
+                <svg class="moving-plane plane-a"><use href="#icon-plane"></use></svg>
+              </div>
+              <div class="orbit orbit-two">
+                <svg class="moving-plane plane-b"><use href="#icon-plane"></use></svg>
+              </div>
+              <div class="orbit orbit-three">
+                <svg class="moving-plane plane-c"><use href="#icon-plane"></use></svg>
+              </div>
+
+              <div class="globe">
+                <span class="lat l1"></span>
+                <span class="lat l2"></span>
+                <span class="lat l3"></span>
+                <span class="lon v1"></span>
+                <span class="lon v2"></span>
+                <span class="land land-a"></span>
+                <span class="land land-b"></span>
+                <span class="land land-c"></span>
+                <span class="hotspot h1"></span>
+                <span class="hotspot h2"></span>
+                <span class="hotspot h3"></span>
+              </div>
+
+              <div id="flight-layer" class="flight-layer" aria-label="Live aircraft vectors"></div>
+            </div>
+
+            <div class="globe-caption">
+              <p>Live Airspace</p>
+              <strong id="region-caption">Europe corridor</strong>
+              <span id="data-origin-caption">OpenSky + replay-safe simulation</span>
+            </div>
+          </div>
+
+          <div id="flight-strip" class="flight-strip" aria-label="Flight vector summary">
+            <article>
+              <svg><use href="#icon-plane"></use></svg>
+              <div>
+                <strong>UAE74W</strong>
+                <span>LON → DUB</span>
+              </div>
+              <small>Normal</small>
+            </article>
+            <article>
+              <svg><use href="#icon-plane"></use></svg>
+              <div>
+                <strong>AF221</strong>
+                <span>CDG → FCO</span>
+              </div>
+              <small>Watch</small>
+            </article>
+            <article>
+              <svg><use href="#icon-plane"></use></svg>
+              <div>
+                <strong>BA930</strong>
+                <span>LHR → CDG</span>
+              </div>
+              <small>Normal</small>
+            </article>
+          </div>
+        </section>
+
+        <aside class="detail-pane" aria-label="Selected flight details">
+          <section class="selected-flight">
+            <div class="flight-header">
+              <div>
+                <span>Selected Flight</span>
+                <h2 id="selected-callsign">UAE74W</h2>
+                <p id="selected-meta">Emirates · B77L · EK9901</p>
+              </div>
+              <svg><use href="#icon-plane"></use></svg>
+            </div>
+
+            <div class="flight-badges" aria-label="Selected flight data labels">
+              <span id="selected-source-badge">REPLAY · SIMULATED</span>
+              <span id="selected-phase-badge">CRUISE</span>
+              <span id="selected-health-badge">ALL_OK</span>
+            </div>
+
+            <div class="route-card">
+              <div>
+                <strong id="route-origin-code">LON</strong>
+                <span id="route-origin-label">UK, London</span>
+                <small id="route-origin-time">UTC +00:00</small>
+              </div>
+              <div class="route-progress">
+                <svg><use href="#icon-plane"></use></svg>
+              </div>
+              <div>
+                <strong id="route-destination-code">DUB</strong>
+                <span id="route-destination-label">UAE, Dubai</span>
+                <small id="route-destination-time">UTC +04:00</small>
+              </div>
+            </div>
+
+            <div class="time-grid">
+              <div><span>Last contact</span><strong id="telemetry-contact">--</strong></div>
+              <div><span>Ground speed</span><strong id="telemetry-speed">--</strong></div>
+              <div><span>Altitude</span><strong id="telemetry-altitude">--</strong></div>
+              <div><span>Vertical rate</span><strong id="telemetry-vertical">--</strong></div>
+            </div>
+
+            <div class="telemetry-grid" aria-label="Selected flight telemetry">
+              <div><span>Heading</span><strong id="telemetry-heading">--</strong></div>
+              <div><span>Squawk</span><strong id="telemetry-squawk">--</strong></div>
+              <div><span>Source</span><strong id="telemetry-source">COMPUTED</strong></div>
+            </div>
+
+            <p class="selected-check-note">
+              <strong>Computed check:</strong>
+              <span id="selected-check-note">Awaiting aircraft state vector.</span>
+            </p>
+          </section>
+
+          <section class="verdict-card" id="verdict-card">
+            <div>
+              <span>SKY SHIELD Verdict</span>
+              <strong id="verdict">ALL_OK</strong>
+            </div>
+            <p id="verdict-copy">Live track, altitude, and phase remain coherent.</p>
+          </section>
+
+          <section class="integrity-stack" aria-label="Integrity layer scores">
+            <div>
+              <span>Input Integrity</span>
+              <meter id="input-meter" min="0" max="100" value="96"></meter>
+              <strong id="input-score">96</strong>
+            </div>
+            <div>
+              <span>Physics Output</span>
+              <meter id="physics-meter" min="0" max="100" value="98"></meter>
+              <strong id="physics-score">98</strong>
+            </div>
+            <div>
+              <span>Behavioral Signal</span>
+              <meter id="behavior-meter" min="0" max="100" value="91"></meter>
+              <strong id="behavior-score">91</strong>
+            </div>
+          </section>
+
+          <button id="attack-button" class="attack-button" type="button">
+            <svg><use href="#icon-alert"></use></svg>
+            Simulate GPS Spoofing
+          </button>
+        </aside>
+
+        <section class="widget-row" aria-label="Operational widgets">
+          <article class="widget risk-widget">
+            <div class="widget-heading">
+              <span>Punctuality APR</span>
+              <strong>78.2%</strong>
+            </div>
+            <div class="donut"></div>
+          </article>
+
+          <article class="widget source-widget">
+            <div class="widget-heading">
+              <span>Data Sources</span>
+              <strong>Synced</strong>
+            </div>
+            <ul>
+              <li><span></span>OpenSky state vectors</li>
+              <li><span></span>Derived physics checks</li>
+              <li><span></span>Replay-safe simulation</li>
+            </ul>
+          </article>
+
+          <article class="widget timeline-widget">
+            <div class="widget-heading">
+              <span>Evidence Log</span>
+              <button type="button" data-section-target="evidence-log">See All Data</button>
+            </div>
+            <ol id="event-list">
+              <li>
+                <svg><use href="#icon-plane"></use></svg>
+                <div>
+                  <strong>UAE74W</strong>
+                  <p>Position and altitude coherent with cruise phase.</p>
+                </div>
+                <time>10:20Z</time>
+              </li>
+              <li>
+                <svg><use href="#icon-plane"></use></svg>
+                <div>
+                  <strong>AF221</strong>
+                  <p>Vertical-rate variance above corridor baseline.</p>
+                </div>
+                <time>10:22Z</time>
+              </li>
+            </ol>
+          </article>
+        </section>
+      </section>
+
+      <section id="flight-lens" class="flight-lens-shell" aria-label="Flight Lens detailed inspection">
+        <div class="lens-header">
+          <div>
+            <span class="section-eyebrow">Flight Lens</span>
+            <h2>Selected aircraft forensic view</h2>
+            <p>
+              Live identity, telemetry history, and rule-based SKY SHIELD checks
+              for the aircraft selected in Live Airspace.
+            </p>
+          </div>
+          <div class="lens-header-status" aria-label="Flight Lens status summary">
+            <span id="lens-source-badge">REPLAY · SIMULATED</span>
+            <strong id="lens-callsign">UAE74W</strong>
+            <small id="lens-verdict">ALL_OK</small>
+          </div>
+        </div>
+
+        <div class="lens-grid">
+          <article class="lens-card lens-identity-card">
+            <div class="lens-card-heading">
+              <span>Identity</span>
+              <strong id="lens-phase">CRUISE</strong>
+            </div>
+            <div class="lens-identity-lockup">
+              <svg><use href="#icon-plane"></use></svg>
+              <div>
+                <h3 id="lens-identity-callsign">UAE74W</h3>
+                <p id="lens-identity-country">United Arab Emirates</p>
+              </div>
+            </div>
+            <dl class="lens-facts">
+              <div>
+                <dt>ICAO24</dt>
+                <dd id="lens-icao">8964A1</dd>
+              </div>
+              <div>
+                <dt>Position Source</dt>
+                <dd id="lens-position-source">REPLAY</dd>
+              </div>
+              <div>
+                <dt>Last Contact</dt>
+                <dd id="lens-last-contact">--</dd>
+              </div>
+              <div>
+                <dt>Squawk</dt>
+                <dd id="lens-squawk">----</dd>
+              </div>
+            </dl>
+          </article>
+
+          <article class="lens-card lens-telemetry-card">
+            <div class="lens-card-heading">
+              <span>Telemetry</span>
+              <strong id="lens-telemetry-source">COMPUTED</strong>
+            </div>
+            <div class="lens-data-grid">
+              <div><span>Latitude</span><strong id="lens-latitude">--</strong></div>
+              <div><span>Longitude</span><strong id="lens-longitude">--</strong></div>
+              <div><span>Altitude</span><strong id="lens-altitude">--</strong></div>
+              <div><span>Speed</span><strong id="lens-speed">--</strong></div>
+              <div><span>Heading</span><strong id="lens-heading">--</strong></div>
+              <div><span>Vertical Rate</span><strong id="lens-vertical-rate">--</strong></div>
+            </div>
+          </article>
+
+          <article class="lens-card lens-chart-card">
+            <div class="lens-card-heading">
+              <span>Telemetry History</span>
+              <strong>24 samples</strong>
+            </div>
+            <div class="chart-grid">
+              <div class="mini-chart">
+                <div><span>Altitude</span><strong id="lens-altitude-live">--</strong></div>
+                <svg id="lens-altitude-chart" viewBox="0 0 180 64" aria-hidden="true"></svg>
+              </div>
+              <div class="mini-chart">
+                <div><span>Speed</span><strong id="lens-speed-live">--</strong></div>
+                <svg id="lens-speed-chart" viewBox="0 0 180 64" aria-hidden="true"></svg>
+              </div>
+              <div class="mini-chart">
+                <div><span>Vertical Rate</span><strong id="lens-vertical-live">--</strong></div>
+                <svg id="lens-vertical-chart" viewBox="0 0 180 64" aria-hidden="true"></svg>
+              </div>
+              <div class="mini-chart">
+                <div><span>Heading</span><strong id="lens-heading-live">--</strong></div>
+                <svg id="lens-heading-chart" viewBox="0 0 180 64" aria-hidden="true"></svg>
+              </div>
+            </div>
+          </article>
+
+          <article class="lens-card lens-check-card">
+            <div class="lens-card-heading">
+              <span>Integrity Checks</span>
+              <strong>RULE-BASED · ML-READY</strong>
+            </div>
+            <div id="lens-check-list" class="lens-check-list">
+              <div class="pass">
+                <span></span>
+                <div>
+                  <strong>Position staleness</strong>
+                  <p>Awaiting selected vector.</p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="lens-card lens-summary-card">
+            <div class="lens-card-heading">
+              <span>SKY SHIELD Summary</span>
+              <strong id="lens-risk-label" class="lens-risk-label">LOW RISK</strong>
+            </div>
+            <p id="lens-summary-copy">
+              Position, altitude, speed, and phase remain coherent.
+            </p>
+            <div class="lens-score-row">
+              <span>Input Integrity</span>
+              <meter id="lens-input-meter" min="0" max="100" value="96"></meter>
+              <strong id="lens-input-score">96</strong>
+            </div>
+            <div class="lens-score-row">
+              <span>Physics Safety</span>
+              <meter id="lens-physics-meter" min="0" max="100" value="98"></meter>
+              <strong id="lens-physics-score">98</strong>
+            </div>
+            <div class="lens-score-row">
+              <span>Behavioral Confidence</span>
+              <meter id="lens-behavior-meter" min="0" max="100" value="91"></meter>
+              <strong id="lens-behavior-score">91</strong>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="integrity-engine" class="engine-shell" aria-label="Integrity Engine rule analysis">
+        <div class="engine-header">
+          <div>
+            <span class="section-eyebrow">Integrity Engine</span>
+            <h2>Runtime checks before AI output becomes trusted.</h2>
+            <p>
+              SKY SHIELD separates public telemetry, computed physics checks,
+              simulated behavioral signals, and fleet intelligence so every
+              verdict can be explained.
+            </p>
+          </div>
+          <div class="engine-verdict-panel" aria-label="Integrity Engine verdict">
+            <span id="engine-source">REPLAY · SIMULATED</span>
+            <strong id="engine-callsign">UAE74W</strong>
+            <small id="engine-verdict">ALL_OK</small>
+          </div>
+        </div>
+
+        <div class="engine-pipeline" aria-label="SKY SHIELD integrity pipeline">
+          <article>
+            <span>01</span>
+            <strong>State Vector</strong>
+            <p id="engine-pipeline-source">OpenSky / replay vector received.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <strong>Input Checks</strong>
+            <p>Freshness, phase, speed, altitude, and vertical-rate logic.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <strong>Physics Gate</strong>
+            <p>Rejects recommendations that conflict with aircraft motion.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <strong>Trusted Verdict</strong>
+            <p id="engine-pipeline-verdict">AI output allowed only after integrity pass.</p>
+          </article>
+        </div>
+
+        <div class="engine-grid">
+          <article class="engine-layer-card">
+            <div class="engine-layer-heading">
+              <span>Layer 01</span>
+              <strong id="engine-input-status">ALL_OK</strong>
+            </div>
+            <h3>Input Integrity</h3>
+            <p>Checks whether incoming state data is plausible for the current flight phase.</p>
+            <div class="engine-score">
+              <meter id="engine-input-meter" min="0" max="100" value="96"></meter>
+              <strong id="engine-input-score">96</strong>
+            </div>
+          </article>
+
+          <article class="engine-layer-card">
+            <div class="engine-layer-heading">
+              <span>Layer 02</span>
+              <strong id="engine-physics-status">ALL_OK</strong>
+            </div>
+            <h3>Physics Output</h3>
+            <p>Checks whether an AI recommendation is physically possible and operationally safe.</p>
+            <div class="engine-score">
+              <meter id="engine-physics-meter" min="0" max="100" value="98"></meter>
+              <strong id="engine-physics-score">98</strong>
+            </div>
+          </article>
+
+          <article class="engine-layer-card">
+            <div class="engine-layer-heading">
+              <span>Layer 03</span>
+              <strong id="engine-behavior-status">SIMULATED</strong>
+            </div>
+            <h3>Behavioral Signal</h3>
+            <p>Simulates whether control-input rhythm looks human or machine-injected.</p>
+            <div class="engine-score">
+              <meter id="engine-behavior-meter" min="0" max="100" value="91"></meter>
+              <strong id="engine-behavior-score">91</strong>
+            </div>
+          </article>
+
+          <article class="engine-layer-card">
+            <div class="engine-layer-heading">
+              <span>Layer 04</span>
+              <strong id="engine-fleet-status">COMPUTED</strong>
+            </div>
+            <h3>Fleet Intelligence</h3>
+            <p>Looks for similar anomaly signatures across the monitored airspace.</p>
+            <div class="engine-score">
+              <meter id="engine-fleet-meter" min="0" max="100" value="94"></meter>
+              <strong id="engine-fleet-score">94</strong>
+            </div>
+          </article>
+
+          <article class="engine-rules-card">
+            <div class="engine-section-heading">
+              <span>Rule Bank</span>
+              <strong>RULE-BASED · ML-READY</strong>
+            </div>
+            <div id="engine-rule-list" class="engine-rule-list">
+              <div class="pass">
+                <span></span>
+                <div>
+                  <strong>Awaiting vector</strong>
+                  <p>Select an aircraft to evaluate integrity checks.</p>
+                </div>
+                <small>READY</small>
+              </div>
+            </div>
+          </article>
+
+          <article class="engine-gate-card">
+            <div class="engine-section-heading">
+              <span>AI Recommendation Gate</span>
+              <strong id="engine-gate-status">ALLOW</strong>
+            </div>
+            <p id="engine-summary">
+              Current vector is coherent. AI recommendation remains eligible for trusted review.
+            </p>
+            <div class="gate-verdict">
+              <span id="engine-gate-label">TRUSTED_OUTPUT_ALLOWED</span>
+              <strong id="engine-risk-label">LOW RISK</strong>
+            </div>
+            <ul>
+              <li><span></span>Telemetry source labeled before scoring</li>
+              <li><span></span>Unsafe physics conflicts quarantine AI output</li>
+              <li><span></span>Rule cards can become ML features later</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="threat-sim" class="threat-shell" aria-label="Threat simulation">
+        <div class="threat-header">
+          <div>
+            <span class="section-eyebrow">Threat Sim</span>
+            <h2>Show the attack, then show the block.</h2>
+            <p>
+              Inject a cyber scenario against the selected aircraft and watch
+              SKY SHIELD separate verified motion from spoofed inputs before AI
+              output becomes trusted.
+            </p>
+          </div>
+          <div class="threat-status-panel" aria-label="Threat simulation status">
+            <span id="threat-mode-status">GPS DRIFT</span>
+            <strong id="threat-callsign">UAE74W</strong>
+            <small id="threat-verdict-status">READY</small>
+          </div>
+        </div>
+
+        <div class="threat-grid">
+          <article class="threat-card threat-control-card">
+            <div class="threat-section-heading">
+              <span>Attack Control</span>
+              <strong id="threat-stage">STANDBY</strong>
+            </div>
+            <label class="threat-field" for="threat-mode">
+              <span>Attack Mode</span>
+              <select id="threat-mode">
+                <option value="gps-drift">GPS drift</option>
+                <option value="gps-jump">GPS jump</option>
+                <option value="barometric-injection">Barometric injection</option>
+                <option value="stale-replay">Stale replay</option>
+                <option value="ai-output-attack">AI output attack</option>
+                <option value="control-injection">Control injection</option>
+              </select>
+            </label>
+            <label class="threat-field" for="threat-intensity">
+              <span>Intensity</span>
+              <strong id="threat-intensity-value">55%</strong>
+              <input id="threat-intensity" type="range" min="10" max="100" value="55" />
+            </label>
+            <label class="threat-field" for="threat-duration">
+              <span>Duration</span>
+              <select id="threat-duration">
+                <option value="30">30 seconds</option>
+                <option value="45" selected>45 seconds</option>
+                <option value="60">60 seconds</option>
+              </select>
+            </label>
+            <div class="threat-actions">
+              <button id="threat-start" type="button">Start</button>
+              <button id="threat-pause" type="button">Pause</button>
+              <button id="threat-reset" type="button">Reset</button>
+            </div>
+          </article>
+
+          <article class="threat-card threat-visual-card">
+            <div class="threat-section-heading">
+              <span>Verified vs Spoofed Track</span>
+              <strong id="threat-gate">TRUSTED_OUTPUT_ALLOWED</strong>
+            </div>
+            <div class="threat-track-stage">
+              <svg id="threat-track-svg" viewBox="0 0 720 320" role="img" aria-label="Verified and spoofed flight paths"></svg>
+              <div class="threat-track-legend">
+                <span><i class="verified"></i>Verified motion</span>
+                <span><i class="spoofed"></i>Spoofed input</span>
+              </div>
+            </div>
+            <div class="threat-metrics">
+              <div>
+                <span>Divergence</span>
+                <strong id="threat-divergence">0.0 NM</strong>
+              </div>
+              <div>
+                <span>GPS Offset</span>
+                <strong id="threat-offset">0 m</strong>
+              </div>
+              <div>
+                <span>Gate State</span>
+                <strong id="threat-gate-state">ALLOW</strong>
+              </div>
+            </div>
+          </article>
+
+          <article class="threat-card threat-sensor-card">
+            <div class="threat-section-heading">
+              <span>Sensor Degradation</span>
+              <strong>SIMULATED</strong>
+            </div>
+            <div class="threat-sensor-grid">
+              <div><span>GNSS</span><strong id="threat-gnss-status">NOMINAL</strong></div>
+              <div><span>Barometric</span><strong id="threat-baro-status">MATCH</strong></div>
+              <div><span>INS Cross-check</span><strong id="threat-ins-status">MATCH</strong></div>
+              <div><span>AI Gate</span><strong id="threat-ai-status">ALLOW</strong></div>
+            </div>
+          </article>
+
+          <article class="threat-card threat-timeline-card">
+            <div class="threat-section-heading">
+              <span>Attack Timeline</span>
+              <strong id="threat-progress-label">0%</strong>
+            </div>
+            <ol id="threat-timeline" class="threat-timeline">
+              <li class="active">
+                <span></span>
+                <div>
+                  <strong>Normal monitoring</strong>
+                  <p>Aircraft state is coherent before attack injection.</p>
+                </div>
+              </li>
+            </ol>
+          </article>
+        </div>
+      </section>
+
+      <section id="fleet-intelligence" class="fleet-shell" aria-label="Fleet Intelligence">
+        <div class="fleet-header">
+          <div>
+            <span class="section-eyebrow">Fleet Intelligence</span>
+            <h2>Turn one aircraft anomaly into shared fleet protection.</h2>
+            <p>
+              SKY SHIELD keeps raw aircraft telemetry local, extracts threat
+              signatures, and shows how an update could be shared across a
+              monitored fleet without pretending to be certified avionics.
+            </p>
+          </div>
+          <div class="fleet-status-panel" aria-label="Fleet Intelligence status">
+            <span id="fleet-source-label">COMPUTED · SIGNATURES</span>
+            <strong id="fleet-selected-signature">GPS_DRIFT_SIGNATURE</strong>
+            <small id="fleet-sharing-status">STANDBY</small>
+          </div>
+        </div>
+
+        <div class="fleet-grid">
+          <article class="fleet-card fleet-map-card">
+            <div class="fleet-card-heading">
+              <span>Regional Anomaly Heatmap</span>
+              <strong id="fleet-region-state">Europe corridor</strong>
+            </div>
+            <div id="fleet-region-grid" class="fleet-region-grid" aria-label="Regional anomaly status">
+              <div>
+                <span>Europe</span>
+                <strong>3 watch</strong>
+                <meter min="0" max="100" value="42"></meter>
+              </div>
+            </div>
+          </article>
+
+          <article class="fleet-card fleet-signature-card">
+            <div class="fleet-card-heading">
+              <span>Threat Signatures</span>
+              <strong id="fleet-signature-count">4 ACTIVE</strong>
+            </div>
+            <div id="fleet-signature-list" class="fleet-signature-list">
+              <div>
+                <span></span>
+                <div>
+                  <strong>GPS_DRIFT_SIGNATURE</strong>
+                  <p>Position drift diverges from verified motion.</p>
+                </div>
+                <small>READY</small>
+              </div>
+            </div>
+          </article>
+
+          <article class="fleet-card fleet-affected-card">
+            <div class="fleet-card-heading">
+              <span>Affected Aircraft</span>
+              <strong id="fleet-affected-count">0 TRACKS</strong>
+            </div>
+            <div id="fleet-affected-list" class="fleet-affected-list">
+              <div>
+                <span>--</span>
+                <strong>No active signature</strong>
+                <small>STANDBY</small>
+              </div>
+            </div>
+          </article>
+
+          <article class="fleet-card fleet-learning-card">
+            <div class="fleet-card-heading">
+              <span>Federated Update</span>
+              <strong id="fleet-baseline-score">0%</strong>
+            </div>
+            <div class="fleet-learning-steps">
+              <div>
+                <span>01</span>
+                <div>
+                  <strong>Raw telemetry stays local</strong>
+                  <p id="fleet-raw-data-status">No raw aircraft stream is shared outside this prototype surface.</p>
+                </div>
+              </div>
+              <div>
+                <span>02</span>
+                <div>
+                  <strong>Signature only</strong>
+                  <p id="fleet-signature-status">Threat pattern is computed from local rules and simulation state.</p>
+                </div>
+              </div>
+              <div>
+                <span>03</span>
+                <div>
+                  <strong>Baseline update</strong>
+                  <p id="fleet-baseline-status">Fleet baseline is ready for review before any model work.</p>
+                </div>
+              </div>
+            </div>
+            <meter id="fleet-baseline-meter" min="0" max="100" value="0"></meter>
+            <p id="fleet-summary" class="fleet-summary">
+              Start Threat Sim to see a signature move from local detection to
+              fleet-level review.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="evidence-log" class="audit-shell" aria-label="Evidence Log">
+        <div class="audit-header">
+          <div>
+            <span class="section-eyebrow">Evidence Log</span>
+            <h2>Every verdict needs a trace.</h2>
+            <p>
+              A readable audit trail for state vectors, integrity rules, threat
+              simulations, source labels, and model-ready training records.
+            </p>
+          </div>
+          <div class="audit-status-panel" aria-label="Evidence Log status">
+            <span id="evidence-source">REPLAY · SIMULATED</span>
+            <strong id="evidence-count">0 RECORDS</strong>
+            <small id="evidence-risk-status">LOW RISK</small>
+          </div>
+        </div>
+
+        <div class="audit-grid">
+          <article class="audit-card evidence-stream-card">
+            <div class="audit-card-heading">
+              <span>Runtime Evidence Stream</span>
+              <strong id="evidence-stream-window">LATEST VECTOR</strong>
+            </div>
+            <div id="evidence-log-list" class="evidence-record-list">
+              <div class="pass">
+                <span></span>
+                <div>
+                  <small>STATE_VECTOR</small>
+                  <strong>Awaiting aircraft state</strong>
+                  <p>Evidence records will appear after the first airspace refresh.</p>
+                </div>
+                <time>--</time>
+              </div>
+            </div>
+          </article>
+
+          <article class="audit-card evidence-detail-card">
+            <div class="audit-card-heading">
+              <span>Selected Case</span>
+              <strong id="evidence-case-id">CASE-PENDING</strong>
+            </div>
+            <dl class="evidence-facts">
+              <div>
+                <dt>Aircraft</dt>
+                <dd id="evidence-aircraft">--</dd>
+              </div>
+              <div>
+                <dt>Integrity Label</dt>
+                <dd id="evidence-label">--</dd>
+              </div>
+              <div>
+                <dt>Source Class</dt>
+                <dd id="evidence-source-class">--</dd>
+              </div>
+              <div>
+                <dt>Review State</dt>
+                <dd id="evidence-review-state">--</dd>
+              </div>
+            </dl>
+            <pre id="evidence-json" class="evidence-json">{}</pre>
+          </article>
+
+          <article class="audit-card evidence-source-card">
+            <div class="audit-card-heading">
+              <span>Data Provenance</span>
+              <strong>HONEST LABELS</strong>
+            </div>
+            <div id="evidence-source-list" class="evidence-source-list">
+              <div>
+                <span></span>
+                <strong>Public ADS-B state vectors</strong>
+                <p>OpenSky public feed when available.</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="audit-card evidence-export-card">
+            <div class="audit-card-heading">
+              <span>ML Training Export</span>
+              <strong id="evidence-export-status">RULE LABELS</strong>
+            </div>
+            <div class="evidence-export-score">
+              <meter id="evidence-export-meter" min="0" max="100" value="0"></meter>
+              <strong id="evidence-export-score">0%</strong>
+            </div>
+            <p id="evidence-export-copy">
+              Evidence records become labeled training rows later. No production
+              model is running in this prototype.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="model-lab" class="model-shell" aria-label="Model Lab">
+        <div class="model-header">
+          <div>
+            <span class="section-eyebrow">Model Lab</span>
+            <h2>Prepare the ML story without faking the ML.</h2>
+            <p>
+              The current product uses rule-based integrity checks. This lab
+              shows which features, labels, and validation gates can become
+              future machine-learning work.
+            </p>
+          </div>
+          <div class="model-status-panel" aria-label="Model Lab status">
+            <span>NO PRODUCTION MODEL</span>
+            <strong id="model-dataset-status">0 LABELS</strong>
+            <small id="model-readiness-status">DATASET BUILDING</small>
+          </div>
+        </div>
+
+        <div class="model-grid">
+          <article class="model-card model-readiness-card">
+            <div class="model-card-heading">
+              <span>Readiness Gate</span>
+              <strong id="model-gate-status">RULE-BASED</strong>
+            </div>
+            <div class="model-readiness-meter">
+              <meter id="model-readiness-meter" min="0" max="100" value="0"></meter>
+              <strong id="model-readiness-score">0%</strong>
+            </div>
+            <p id="model-readiness-copy">
+              Collect evidence, confirm labels, and validate safety behavior
+              before training any model.
+            </p>
+          </article>
+
+          <article class="model-card model-feature-card">
+            <div class="model-card-heading">
+              <span>Candidate Features</span>
+              <strong id="model-feature-count">0 FEATURES</strong>
+            </div>
+            <div id="model-feature-list" class="model-feature-list">
+              <div>
+                <span>01</span>
+                <div>
+                  <strong>altitude_ft</strong>
+                  <p>Current pressure-altitude proxy from public/replay vector.</p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="model-card model-label-card">
+            <div class="model-card-heading">
+              <span>Label Queue</span>
+              <strong id="model-label-status">UNREVIEWED</strong>
+            </div>
+            <div id="model-label-list" class="model-label-list">
+              <div class="watch">
+                <span></span>
+                <div>
+                  <strong>SENSOR_FAULT</strong>
+                  <p>Rule-generated label awaiting analyst review.</p>
+                </div>
+                <small>RULE</small>
+              </div>
+            </div>
+          </article>
+
+          <article class="model-card model-pipeline-card">
+            <div class="model-card-heading">
+              <span>Offline ML Roadmap</span>
+              <strong>LOCKED UNTIL DATASET</strong>
+            </div>
+            <ol class="model-pipeline">
+              <li class="done">
+                <span>01</span>
+                <strong>Capture evidence</strong>
+                <p>Store state vector, rule outputs, and source class.</p>
+              </li>
+              <li class="active">
+                <span>02</span>
+                <strong>Review labels</strong>
+                <p>Separate simulated attacks from public-feed anomalies.</p>
+              </li>
+              <li>
+                <span>03</span>
+                <strong>Train offline</strong>
+                <p>Prototype anomaly ranking away from flight-critical control.</p>
+              </li>
+              <li>
+                <span>04</span>
+                <strong>Validate gates</strong>
+                <p>Compare model output against physics and safety rules.</p>
+              </li>
+            </ol>
+          </article>
+
+          <article class="model-card model-schema-card">
+            <div class="model-card-heading">
+              <span>Training Row Preview</span>
+              <strong id="model-schema-status">JSONL READY</strong>
+            </div>
+            <pre id="model-schema-preview" class="model-schema-preview">{}</pre>
+          </article>
+        </div>
+      </section>
+
+    </main>
+
+    <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
