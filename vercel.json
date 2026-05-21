@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "sky-shield-home/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1.js"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/sky-shield-home/assets/$1"
+    },
+    {
+      "src": "/(.*\\.(?:css|js|png|jpg|jpeg|svg|ico|json))",
+      "dest": "/sky-shield-home/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/sky-shield-home/index.html"
+    }
+  ]
+}

@@ -53,6 +53,19 @@ The local server also exposes:
 
 That endpoint proxies OpenSky public state vectors for the selected demo region. If live public data fails or is unavailable, the frontend falls back to replay-safe simulation.
 
+## Deploy On Vercel
+
+This repo includes `vercel.json` and `api/opensky.js` so Vercel can serve:
+
+- the static dashboard from `sky-shield-home/`
+- the OpenSky proxy at `/api/opensky`
+
+Deploy from the repo root with:
+
+```bash
+npx vercel --prod
+```
+
 ## Data Honesty
 
 SKY SHIELD separates data classes in the UI:
@@ -74,5 +87,5 @@ No production ML model is currently running. Model Lab is a planning and dataset
 ```bash
 node --check sky-shield-home/app.js
 node --check sky-shield-home/server.js
+node --check api/opensky.js
 ```
-
