@@ -1,0 +1,10 @@
+.DS_Store
+.next/
+node_modules/
+docx_preview/
+docx_render/
+restaurant-voice-agent/
+sbcc-lite/
+sbcc-lite.zip
+fasstrack-hawker-hop-bingo.*
+linkedin-profile-banner.*

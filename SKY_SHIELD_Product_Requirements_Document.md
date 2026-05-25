@@ -1641,6 +1641,24 @@ Validation completed:
 - Confirmed all `app.js` ID selectors exist in `index.html`.
 - CSS brace balance check passed.
 
+### 24.25 Vercel Next.js Deployment Correction on 2026-05-25
+
+User request:
+
+- Push the migrated code to GitHub and refresh the Vercel deployment after the code merge.
+
+Actions completed:
+
+- Updated the linked Vercel project framework preset from the old static configuration to `Next.js`.
+- Disabled Vercel SSO deployment protection for the public demo domains so the hosted app can be opened without a Vercel login.
+- Added `.vercelignore` to keep unrelated local workspace artifacts out of manual production deployments.
+- Confirmed the repository remains the source of truth for SKY SHIELD and unrelated local files are not part of the GitHub commit.
+
+Deployment expectation:
+
+- Vercel should build the Next.js App Router page and the `/api/opensky` route from the repo root.
+- Public production URL should remain the project alias once the corrected deployment is promoted.
+
 ### 24.24 Next.js Migration Foundation on 2026-05-25
 
 User request:

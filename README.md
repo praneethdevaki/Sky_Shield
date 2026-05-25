@@ -22,6 +22,7 @@ The current build is a Next.js prototype deployed on Vercel. It is designed for 
 .
 ├── README.md
 ├── SKY_SHIELD_Product_Requirements_Document.md
+├── .vercelignore
 ├── app/
 │   ├── api/opensky/route.js
 │   ├── layout.jsx
@@ -78,6 +79,8 @@ Deploy from the repo root with:
 ```bash
 npx vercel --prod
 ```
+
+The linked Vercel project should use the `Next.js` framework preset. `.vercelignore` keeps unrelated local workspace files out of manual deployments.
 
 ## Data Honesty
 

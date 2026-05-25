@@ -431,6 +431,9 @@ GPS channel raw values, INS raw values, barometric sensor stream, engine paramet
 - Top nav and side rail jump between Live Airspace, Flight Lens, Integrity Engine, Threat Sim, Fleet, Evidence Log, and Model Lab
 - Legacy local Node server/proxy remains at `sky-shield-home/server.js`, but the main local workflow is now `npm run dev` on Next.js
 - Frontend uses `/api/opensky` from the Next.js API route; direct OpenSky fetch remains the `file://` fallback path for the legacy static file
+- Vercel project framework was updated to `Next.js` for the migrated app
+- Vercel SSO deployment protection was disabled for the public demo domains
+- Added repo-level `.vercelignore` so manual deployments do not upload unrelated local workspace folders
 - Integrity-layer meters
 - GPS spoofing simulation button (dark anomaly mode, lowers scores, updates evidence log)
 - Punctuality widget, data source widget, runtime evidence log
