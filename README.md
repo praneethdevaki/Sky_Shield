@@ -2,7 +2,7 @@
 
 SKY SHIELD is a futuristic aviation integrity dashboard prototype. It combines live/replay flight tracking, cyber integrity checks, threat simulation, fleet-signature review, evidence logging, and an honest ML-readiness surface.
 
-The current build is a browser-based prototype with a local Node server. It is designed for demos and product exploration, not certified flight operations.
+The current build is a Next.js prototype deployed on Vercel. It is designed for demos and product exploration, not certified flight operations.
 
 ## What It Includes
 
@@ -22,6 +22,17 @@ The current build is a browser-based prototype with a local Node server. It is d
 .
 ├── README.md
 ├── SKY_SHIELD_Product_Requirements_Document.md
+├── app/
+│   ├── api/opensky/route.js
+│   ├── layout.jsx
+│   └── page.jsx
+├── components/
+│   └── legacy/LegacySkyShield.jsx
+├── lib/
+│   └── airspace/
+├── public/
+│   ├── assets/
+│   └── legacy/
 └── sky-shield-home/
     ├── CLAUDE.md
     ├── app.js
@@ -36,16 +47,17 @@ The current build is a browser-based prototype with a local Node server. It is d
 From the repo root:
 
 ```bash
-node sky-shield-home/server.js
+npm install
+npm run dev
 ```
 
 Then open:
 
 ```text
-http://127.0.0.1:4173/
+http://127.0.0.1:3000/
 ```
 
-The local server also exposes:
+The Next.js app exposes:
 
 ```text
 /api/opensky
@@ -55,10 +67,11 @@ That endpoint proxies OpenSky public state vectors for the selected demo region.
 
 ## Deploy On Vercel
 
-This repo includes `vercel.json` and `api/opensky.js` so Vercel can serve:
+This repo is now a Next.js app, so Vercel can serve:
 
-- the static dashboard from `sky-shield-home/`
-- the OpenSky proxy at `/api/opensky`
+- the dashboard page from `app/page.jsx`
+- the OpenSky proxy at `app/api/opensky/route.js`
+- static assets from `public/`
 
 Deploy from the repo root with:
 
@@ -85,7 +98,9 @@ No production ML model is currently running. Model Lab is a planning and dataset
 ## Validation Commands
 
 ```bash
-node --check sky-shield-home/app.js
-node --check sky-shield-home/server.js
-node --check api/opensky.js
+npm run check
+npm run build
+npm audit --audit-level=moderate --omit=dev
 ```
+
+The legacy vanilla implementation is still kept under `sky-shield-home/` as the visual baseline while the Next.js components are modularized further.

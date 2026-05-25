@@ -392,7 +392,7 @@ GPS channel raw values, INS raw values, barometric sensor stream, engine paramet
 
 ---
 
-## 17. Implementation Status (as of 2026-05-21)
+## 17. Implementation Status (as of 2026-05-25)
 
 **Completed:**
 - Static homepage with aviation hero image (aircraft over clouds)
@@ -418,14 +418,19 @@ GPS channel raw values, INS raw values, barometric sensor stream, engine paramet
 - Fleet Intelligence includes regional anomaly heatmap, threat signatures, affected aircraft, and federated update simulation
 - Evidence Log section built and wired to selected aircraft, source labels, integrity rules, Threat Sim, and model-ready record previews
 - Model Lab section built as an honest ML-readiness surface with candidate features, label queue, offline ML roadmap, and JSONL-style training row preview
+- Next.js migration started: `app/`, `components/`, `lib/`, and `public/` now exist as the new modular app surface
+- Current UI is mounted through `components/legacy/LegacySkyShield.jsx` so the visual product stays stable while sections are converted into smaller React components
+- OpenSky proxy moved to the Next.js App Router at `app/api/opensky/route.js`
+- Shared OpenSky/region logic moved into `lib/airspace/`
+- Static browser assets now live under `public/assets/` and `public/legacy/`
 - Removed the temporary Data & Compute UI section; data/compute work should now be handled as backend/service code, not a dashboard tab
 - Live Airspace now keeps the procedural globe as the default visual and adds a MapLibre satellite globe toggle for real map mode
 - MapLibre now initializes on demand when map mode is requested, which keeps the default globe clean and avoids idle MapLibre console errors
 - Flight icons now use a shared top-down airliner silhouette across globe markers, MapLibre markers, flight cards, selected-flight UI, event rows, and Flight Lens identity
 - Aircraft icons no longer use circular badges; selected states use larger silhouettes, orange/critical coloring, card/rail accents, and drop-shadow glow instead
 - Top nav and side rail jump between Live Airspace, Flight Lens, Integrity Engine, Threat Sim, Fleet, Evidence Log, and Model Lab
-- Local Node server/proxy added at `sky-shield-home/server.js`
-- Frontend uses `/api/opensky` when opened from `http://127.0.0.1:4173`; direct OpenSky fetch remains the `file://` fallback path
+- Legacy local Node server/proxy remains at `sky-shield-home/server.js`, but the main local workflow is now `npm run dev` on Next.js
+- Frontend uses `/api/opensky` from the Next.js API route; direct OpenSky fetch remains the `file://` fallback path for the legacy static file
 - Integrity-layer meters
 - GPS spoofing simulation button (dark anomaly mode, lowers scores, updates evidence log)
 - Punctuality widget, data source widget, runtime evidence log
@@ -434,6 +439,7 @@ GPS channel raw values, INS raw values, barometric sensor stream, engine paramet
 - JavaScript syntax validated ✓
 
 **Next steps (priority order):**
-1. Backend/data-compute layer for persisted evidence records and API normalization
-2. API strategy for production-grade flight/weather/airport data sources
-3. Later ML code path using Evidence Log / Model Lab exports
+1. Convert legacy markup into smaller React components section by section
+2. Add CesiumJS client-only visualization module for ATC-style 3D airspace
+3. Add replay timeline and planned-vs-actual trajectory modules
+4. Backend/data-compute layer for persisted evidence records and API normalization

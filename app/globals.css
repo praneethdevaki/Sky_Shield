@@ -97,7 +97,7 @@ svg {
   background:
     linear-gradient(90deg, rgba(17, 17, 17, 0.96) 0%, rgba(17, 17, 17, 0.62) 42%, rgba(17, 17, 17, 0.2) 100%),
     linear-gradient(180deg, rgba(17, 17, 17, 0.1) 0%, rgba(17, 17, 17, 0.92) 100%),
-    url("./assets/sky-shield-hero-aircraft.png") center / cover no-repeat;
+    url("/assets/sky-shield-hero-aircraft.png") center / cover no-repeat;
 }
 
 .hero-band::after {

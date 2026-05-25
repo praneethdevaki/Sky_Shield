@@ -1641,6 +1641,58 @@ Validation completed:
 - Confirmed all `app.js` ID selectors exist in `index.html`.
 - CSS brace balance check passed.
 
+### 24.24 Next.js Migration Foundation on 2026-05-25
+
+User request:
+
+- Start the first advisor-feedback step ASAP: restructure the repo and migrate the project toward Next.js with heavy modularization.
+
+Actions completed:
+
+- Added a Next.js app foundation at the repository root.
+- Added `package.json`, `package-lock.json`, and `next.config.mjs`.
+- Added App Router files:
+  - `/app/layout.jsx`
+  - `/app/page.jsx`
+  - `/app/api/opensky/route.js`
+- Added `components/legacy/LegacySkyShield.jsx`.
+- Added shared airspace modules:
+  - `/lib/airspace/regions.js`
+  - `/lib/airspace/opensky.js`
+- Added public runtime assets:
+  - `/public/assets/sky-shield-hero-aircraft.png`
+  - `/public/legacy/sky-shield-app.js`
+- Copied the current visual CSS into `/app/globals.css`.
+- Kept `/sky-shield-home/` as the legacy visual baseline while the UI is converted section-by-section into smaller React modules.
+- Removed the old Vercel static build configuration and old standalone Vercel function:
+  - deleted `/vercel.json`
+  - deleted `/api/opensky.js`
+- Moved the live `/api/opensky` behavior into the Next.js API route.
+- Added an npm override for `postcss@8.5.10` after audit flagged the transitive Next.js PostCSS dependency.
+
+Architecture decision:
+
+- This migration intentionally preserves the current SKY SHIELD UI first.
+- The app now runs through Next.js, but the existing dashboard markup and browser interaction script are mounted through `LegacySkyShield`.
+- This gives the next build steps a modular app shell without risking a visual regression during the migration.
+- Future steps should convert one section at a time into real React components:
+  - Live Airspace
+  - Cesium 3D airspace
+  - Replay timeline
+  - Selected aircraft panel
+  - Threat Sim
+  - Evidence Log
+  - Model Lab
+
+Validation completed:
+
+- `npm run check` passed.
+- `npm run build` passed with Next.js 15.5.18.
+- `npm audit --audit-level=moderate --omit=dev` returned zero vulnerabilities after the PostCSS override.
+- Local Next.js app returned HTTP `200` at `http://127.0.0.1:3000/`.
+- Local Next.js `/api/opensky?region=europe` returned live OpenSky payload data.
+- Browser verification confirmed the migrated Next.js app renders the SKY SHIELD dashboard with no fresh console errors.
+
 ### 24.23 Remaining Product Sections Build on 2026-05-21
 
 User request:
